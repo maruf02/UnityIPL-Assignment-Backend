@@ -1,12 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LoginPage from "./Components/Login.jsx/LoginPage.jsx";
-import BuyerHomePage from "./Components/HomePage/BuyerHomePage.jsx";
-import SellerHomePage from "./Components/HomePage/SellerHomePage.jsx";
+
 import SignupPage from "./Components/Login.jsx/SignupPage.jsx";
+import Authprovider from "./Components/Authprovider/Authprovider.jsx";
+import Dashborad from "./Components/Dashborad/Dashborad.jsx";
 
 const router = createBrowserRouter([
   {
@@ -18,17 +18,20 @@ const router = createBrowserRouter([
     element: <SignupPage></SignupPage>,
   },
   {
-    path: "dashboard/buyer",
-    element: <BuyerHomePage></BuyerHomePage>,
-  },
-  {
-    path: "dashboard/seller",
-    element: <SellerHomePage></SellerHomePage>,
+    path: "/dashboard",
+    element: <Dashborad></Dashborad>,
+    children: [
+      {
+        path: "",
+      },
+    ],
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <Authprovider>
+      <RouterProvider router={router} />
+    </Authprovider>
   </React.StrictMode>
 );
