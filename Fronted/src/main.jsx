@@ -7,6 +7,7 @@ import LoginPage from "./Components/Login.jsx/LoginPage.jsx";
 import SignupPage from "./Components/Login.jsx/SignupPage.jsx";
 import Authprovider from "./Components/Authprovider/Authprovider.jsx";
 import Dashborad from "./Components/Dashborad/Dashborad.jsx";
+import PrivateRoute from "./Components/PrivateRoute/PrivateRoute.jsx";
 
 const router = createBrowserRouter([
   {
@@ -19,7 +20,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <Dashborad></Dashborad>,
+    element: (
+      <PrivateRoute>
+        <Dashborad></Dashborad>
+      </PrivateRoute>
+    ),
     children: [
       {
         path: "",
