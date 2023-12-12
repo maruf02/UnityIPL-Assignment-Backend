@@ -29,6 +29,38 @@ async function run() {
         // await client.connect();
 
         const AllUsersCollection = client.db('RandomDB').collection('Users');
+        const AllCatalogCollection = client.db('RandomDB').collection('Catalog');
+
+
+
+
+
+
+
+        app.get('/users', async (req, res) => {
+            const cursor = AllUsersCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+
+
+        // seller check
+
+        app.get('/users/seller/:email', async (req, res) => {
+            const email = req.params.email;
+            // console.log(email);
+            const query = { email: email };
+            const user = await AllUsersCollection.findOne(query);
+            let seller = false;
+            if (user) {
+                seller = user?.role === 'Seller';
+            }
+            // console.log(seller);
+            res.send({ seller: seller });
+        })
+
+
 
 
 
@@ -36,6 +68,7 @@ async function run() {
             const user = req.body;
             const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10h' });
             res.send({ token });
+            // console.log(token);
         })
 
         app.post('/users', async (req, res) => {
@@ -47,6 +80,40 @@ async function run() {
             //     return res.send({ message: 'user already exists', insertedId: null })
             // }
             const result = await AllUsersCollection.insertOne(newUser);
+            res.send(result);
+        })
+
+
+
+
+
+
+
+
+
+        app.get('/catalog', async (req, res) => {
+
+            const cursor = AllCatalogCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+        app.get('/catalog/:email', async (req, res) => {
+            const email = req.params.email;
+            console.log('cc', email);
+            const cursor = AllCatalogCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+        app.post('/catalog', async (req, res) => {
+            const newCatalog = req.body;
+            console.log(newCatalog);
+            const query = { email: newCatalog.email }
+            const existingUser = await AllCatalogCollection.findOne(query);
+            if (existingUser) {
+                return res.send({ message: 'user already exists', insertedId: null })
+            }
+            const result = await AllCatalogCollection.insertOne(newCatalog);
             res.send(result);
         })
 

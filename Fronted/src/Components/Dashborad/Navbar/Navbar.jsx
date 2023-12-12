@@ -1,21 +1,38 @@
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { AuthContext } from "../../Authprovider/Authprovider";
+import useSeller from "../../CustomHooks/useSeller";
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
   const handleSignOut = () => {
     logOut().then().catch();
   };
+
+  const [isSeller] = useSeller();
   return (
     <div className="navbar bg-green-700 rounded-2xl flex justify-between">
       <Link to="/dashboard">
         <div className="navbar-center  ">
-          <a className="btn btn-ghost text-xl font-semibold">
+          <p className="btn btn-ghost text-xl font-semibold">
             UnityIPL Assignment Frontend
-          </a>
+          </p>
         </div>
       </Link>
+
+      <div>
+        {isSeller ? (
+          <>
+            <p className="text-lg underline pr-5">Seller:- </p>
+
+            <p>
+              <Link to="/dashboard/addCatalog">AddCatalog</Link>
+            </p>
+          </>
+        ) : (
+          <></>
+        )}
+      </div>
       <div className="navbar-end">
         {/*  */}
         {user ? (

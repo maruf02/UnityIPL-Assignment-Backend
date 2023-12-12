@@ -8,6 +8,11 @@ import SignupPage from "./Components/Login.jsx/SignupPage.jsx";
 import Authprovider from "./Components/Authprovider/Authprovider.jsx";
 import Dashborad from "./Components/Dashborad/Dashborad.jsx";
 import PrivateRoute from "./Components/PrivateRoute/PrivateRoute.jsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import SellerHome from "./Components/SellerHome/SellerHome.jsx";
+import AddCatalog from "./Components/SellerHome/AddCatalog.jsx";
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -20,14 +25,15 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: (
-      <PrivateRoute>
-        <Dashborad></Dashborad>
-      </PrivateRoute>
-    ),
+    element: <Dashborad></Dashborad>,
     children: [
       {
-        path: "",
+        path: "/dashboard",
+        element: <SellerHome></SellerHome>,
+      },
+      {
+        path: "/dashboard/addCatalog",
+        element: <AddCatalog></AddCatalog>,
       },
     ],
   },
@@ -36,7 +42,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Authprovider>
-      <RouterProvider router={router} />
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
     </Authprovider>
   </React.StrictMode>
 );
