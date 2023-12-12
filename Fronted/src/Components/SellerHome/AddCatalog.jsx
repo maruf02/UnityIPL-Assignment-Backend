@@ -64,6 +64,7 @@ const AddCatalog = () => {
       </div>
     </div>
     //   Add catalog section
+    //   Add catalog item section
   );
 };
 
