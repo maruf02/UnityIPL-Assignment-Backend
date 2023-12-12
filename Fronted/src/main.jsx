@@ -11,6 +11,7 @@ import PrivateRoute from "./Components/PrivateRoute/PrivateRoute.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import SellerHome from "./Components/SellerHome/SellerHome.jsx";
 import AddCatalog from "./Components/SellerHome/AddCatalog.jsx";
+import UpdateItem from "./Components/SellerHome/UpdateItem.jsx";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,12 @@ const router = createBrowserRouter([
       {
         path: "/dashboard/addCatalog",
         element: <AddCatalog></AddCatalog>,
+      },
+      {
+        path: "/dashboard/updateItem/:id",
+        element: <UpdateItem></UpdateItem>,
+        loader: ({ params }) =>
+          fetch(`http://localhost:5000/itemss/${params.id}`),
       },
     ],
   },

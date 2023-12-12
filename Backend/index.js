@@ -30,6 +30,7 @@ async function run() {
 
         const AllUsersCollection = client.db('RandomDB').collection('Users');
         const AllCatalogCollection = client.db('RandomDB').collection('Catalog');
+        const AllItemsCollection = client.db('RandomDB').collection('Items');
 
 
 
@@ -99,7 +100,7 @@ async function run() {
         })
         app.get('/catalog/:email', async (req, res) => {
             const email = req.params.email;
-            console.log('cc', email);
+            // console.log('cc', email);
             const cursor = AllCatalogCollection.find();
             const result = await cursor.toArray();
             res.send(result);
@@ -122,8 +123,49 @@ async function run() {
 
 
 
+        app.get('/items/:email', async (req, res) => {
+            const email = req.params.email;
+            console.log('cc', email);
+            const cursor = AllItemsCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
 
+        app.get('/itemss/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await AllItemsCollection.findOne(query);
+            res.send(result);
+        })
 
+        app.post('/items', async (req, res) => {
+            const newWorkSheet = req.body;
+            console.log(newWorkSheet);
+            const result = await AllItemsCollection.insertOne(newWorkSheet);
+            console.log(result);
+            res.send(result);
+        })
+
+        app.put('/items/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const option = { upsert: true }
+            const updateTask = req.body;
+            const task = {
+                $set: {
+                    cname: updateTask.cname,
+                    iname: updateTask.iname,
+                    price: updateTask.price,
+                    email: updateTask.email,
+
+                }
+            }
+
+            const result = await AllItemsCollection.updateOne(filter, task, option);
+            console.log(updateTask);
+            res.send(result);
+
+        })
 
 
 

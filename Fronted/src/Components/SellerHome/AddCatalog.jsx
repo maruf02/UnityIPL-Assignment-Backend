@@ -2,13 +2,51 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Authprovider/Authprovider";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../CustomHooks/useAxiosSecure";
-import { useLoaderData } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
+import useSeller from "../CustomHooks/useSeller";
 
 const AddCatalog = () => {
   const { user } = useContext(AuthContext);
   const axiosSecure = useAxiosSecure();
+  const [userCatalogName, setUserCatalogName] = useState("");
+  const [userItem, setUserItem] = useState([]);
+  const [isSeller, isSellerLoading, refetch] = useSeller();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
-  const handleSignIn = async (e) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const email = user?.email;
+        const response = await axiosSecure.get(`/catalog/${email}`);
+        const userCatalog = response.data[0]?.name;
+
+        setUserCatalogName(userCatalog || "");
+      } catch (error) {
+        console.error("Error fetching user catalog:", error);
+      }
+    };
+
+    fetchData();
+  }, [axiosSecure, user?.email]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const email = user?.email;
+        const response = await axiosSecure.get(`/items/${email}`);
+        const userCatalog = response.data;
+
+        setUserItem(userCatalog);
+      } catch (error) {
+        console.error("Error fetching user catalog:", error);
+      }
+    };
+
+    fetchData();
+  }, [axiosSecure, user?.email]);
+
+  const handleAddCatalog = async (e) => {
     e.preventDefault();
     const form = e.target;
     const name = form.name.value;
@@ -16,8 +54,10 @@ const AddCatalog = () => {
     const info = { name, email };
 
     const response = await axiosSecure.get(`/catalog/${email}`);
-    const userStatus = response.data[0].email;
-    if (userStatus === email) {
+    const userEmail = response.data[0]?.email;
+    const usercatalog = response.data[0]?.name;
+
+    if (userEmail === email) {
       Swal.fire(`You can create only one catalog.Already Create a catalog.`);
     } else {
       axiosSecure.post("/catalog", info).then((res) => {
@@ -29,42 +69,204 @@ const AddCatalog = () => {
             showConfirmButton: false,
             timer: 2500,
           });
+          setUserCatalogName(name);
+          refetch();
         }
       });
     }
   };
-  return (
-    //   Add catalog section
-    <div className="hero min-h-screen bg-base-200">
-      <div className="hero-content flex-col lg:flex-row-reverse">
-        <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
-          <h2 className="text-center">
-            Add Catalog <br />
-            (Seller can add only one catalog)
-          </h2>
-          <form onSubmit={handleSignIn} className="card-body">
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Catalog name</span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                placeholder="email"
-                className="input input-bordered"
-                required
-              />
-            </div>
 
-            <div className="form-control mt-6">
-              <button className="btn btn-primary">ADD</button>
-            </div>
-          </form>
+  const handleAddItem = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const cname = form.cname.value;
+    const iname = form.iname.value;
+    const price = form.price.value;
+    const email = user?.email;
+    const info = { cname, iname, price, email };
+
+    // console.log(info);
+
+    axiosSecure.post("/items", info).then((res) => {
+      if (res.data.insertedId) {
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: `${name} added to your item's`,
+          showConfirmButton: false,
+          timer: 2500,
+        });
+        setUserItem((prevUserItems) => [...prevUserItems, info]);
+        refetch();
+      }
+    });
+  };
+
+  const handleEdit = (item) => {
+    setIsEditMode(true);
+    setSelectedItem(item);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+    setSelectedItem(null);
+  };
+
+  const handleUpdateItem = (e) => {
+    e.preventDefault();
+
+    setIsEditMode(false);
+    setSelectedItem(null);
+  };
+
+  return (
+    <div className="flex flex-row ">
+      {/* // Add catalog section */}
+      <div className="hero min-h-screen bg-base-200">
+        <div className="hero-content flex-col lg:flex-row-reverse">
+          <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+            <h2 className="text-center">
+              Add Catalog <br />
+              (Seller can add only one catalog)
+            </h2>
+            <form onSubmit={handleAddCatalog} className="card-body">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Catalog name</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Catalog name"
+                  className="input input-bordered"
+                  required
+                />
+              </div>
+
+              <div className="form-control mt-6">
+                <button className="btn btn-primary">ADD</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
+      {/* // Add catalog section */}
+
+      {/* // Add catalog item section */}
+      <div className="hero min-h-screen bg-base-200">
+        <div className="hero-content flex-col lg:flex-row-reverse">
+          <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+            <h2 className="text-center">
+              Add Catalog item <br />
+            </h2>
+            <form onSubmit={handleAddItem} className="card-body">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Catalog name</span>
+                </label>
+                <input
+                  type="text"
+                  name="cname"
+                  defaultValue={userCatalogName}
+                  readOnly
+                  placeholder="Catalog name"
+                  className="input input-bordered"
+                  required
+                />
+              </div>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">item name</span>
+                </label>
+                <input
+                  type="text"
+                  name="iname"
+                  placeholder="item name"
+                  className="input input-bordered"
+                  required
+                />
+              </div>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">item Price</span>
+                </label>
+                <input
+                  type="text"
+                  name="price"
+                  placeholder="item Price"
+                  className="input input-bordered"
+                  required
+                />
+              </div>
+
+              <div className="form-control mt-6">
+                {userCatalogName ? (
+                  <>
+                    <button className="btn  btn-primary">ADD Item</button>
+                  </>
+                ) : (
+                  <>
+                    <button className="btn btn-primary" disabled>
+                      ADD Item
+                    </button>
+                  </>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      {/* // Add catalog item section */}
+      {/* // Add catalog item section */}
+      <div className="hero min-h-screen bg-base-200">
+        <div className="hero-content flex-col lg:flex-row-reverse">
+          <div className="card shrink-0 w-full   shadow-2xl bg-base-100">
+            <h2 className="text-center">
+              View All item <br />
+            </h2>
+            <div className="overflow-x-auto w-full">
+              <table className="table">
+                {/* head */}
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Email</th>
+                    <th>Catalog</th>
+                    <th>ItemName</th>
+                    <th>Price</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {userItem.map((item, index) => (
+                    <tr key={item._id}>
+                      <th>{index + 1}</th>
+                      <td>{item.email}</td>
+                      <td>{item.cname}</td>
+                      <td>{item.iname}</td>
+                      <td>${item.price}</td>
+                      <td>
+                        <Link to={`/dashboard/updateItem/${item._id}`}>
+                          <button className="btn">Edit</button>
+                        </Link>
+                      </td>
+                      <td>
+                        <button className="btn">Delete</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* // Add catalog item section */}
+      {/* // update  item show section */}
+
+      {/* // update   item show section */}
     </div>
-    //   Add catalog section
-    //   Add catalog item section
   );
 };
 

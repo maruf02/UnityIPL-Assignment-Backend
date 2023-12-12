@@ -6,7 +6,11 @@ import { useQuery } from "@tanstack/react-query";
 const useSeller = () => {
   const { user, loading } = useContext(AuthContext);
   const axiosSecure = useAxiosSecure();
-  const { data: isSeller, isPending: isSellerLoading } = useQuery({
+  const {
+    refetch,
+    data: isSeller,
+    isPending: isSellerLoading,
+  } = useQuery({
     queryKey: [user?.email, "isSeller"],
     enabled: !loading,
     queryFn: async () => {
@@ -16,7 +20,7 @@ const useSeller = () => {
       return res.data?.seller;
     },
   });
-  return [isSeller, isSellerLoading];
+  return [isSeller, isSellerLoading, refetch];
 };
 
 export default useSeller;
