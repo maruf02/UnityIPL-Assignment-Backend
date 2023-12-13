@@ -1,4 +1,5 @@
 # UnityIPL-Assignment-Backend
+<<<<<<< HEAD
 
 ## Instruction:
 
@@ -19,3 +20,5 @@
 - then npm run dev
 - then open it your browser.
   Thanks
+=======
+>>>>>>> a92c330774822a36873ab5b2f295e4f100bc91fe
