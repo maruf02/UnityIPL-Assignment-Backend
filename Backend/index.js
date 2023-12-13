@@ -28,6 +28,7 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         // await client.connect();
 
+        // All collection
         const AllUsersCollection = client.db('RandomDB').collection('Users');
         const AllCatalogCollection = client.db('RandomDB').collection('Catalog');
         const AllItemsCollection = client.db('RandomDB').collection('Items');
@@ -35,19 +36,25 @@ async function run() {
 
 
 
-        // **********************************************************
-        // all seler api
 
 
+        // all users api
         app.get('/users', async (req, res) => {
             const cursor = AllUsersCollection.find();
             const result = await cursor.toArray();
             res.send(result);
         })
 
+        // all seller list api
+        app.get('/users/seller', async (req, res) => {
+            const role = 'Seller';
+            console.log(role);
+            const query = { role: role }
+            const result = await AllUsersCollection.find(query).toArray();
+            res.send(result);
+        })
 
-
-        // seller check
+        // seller check api
 
         app.get('/users/seller/:email', async (req, res) => {
             const email = req.params.email;
@@ -72,15 +79,10 @@ async function run() {
             res.send({ token });
             // console.log(token);
         })
-
+        // users post api
         app.post('/users', async (req, res) => {
             const newUser = req.body;
             console.log(newUser);
-            // const query = { email: newUser.email }
-            // const existingUser = await AllUsersCollection.findOne(query);
-            // if (existingUser) {
-            //     return res.send({ message: 'user already exists', insertedId: null })
-            // }
             const result = await AllUsersCollection.insertOne(newUser);
             res.send(result);
         })
@@ -91,7 +93,7 @@ async function run() {
 
 
 
-
+        // all catalog get api
 
         app.get('/catalog', async (req, res) => {
 
@@ -99,6 +101,7 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         })
+        // email wise catalog get api
         app.get('/catalog/:email', async (req, res) => {
             const email = req.params.email;
             // console.log('cc', email);
@@ -107,7 +110,7 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         })
-
+        // catalog post api
         app.post('/catalog', async (req, res) => {
             const newCatalog = req.body;
             console.log(newCatalog);
@@ -122,13 +125,13 @@ async function run() {
 
 
 
-
+        // all item get api
         app.get('/items', async (req, res) => {
             const cursor = AllItemsCollection.find();
             const result = await cursor.toArray();
             res.send(result);
         })
-
+        // email wise item get api
         app.get('/items/:email', async (req, res) => {
             const email = req.params.email;
             console.log('cc', email);
@@ -137,14 +140,14 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         })
-
+        // specific id wise item get api
         app.get('/itemss/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             const result = await AllItemsCollection.findOne(query);
             res.send(result);
         })
-
+        // all item post api
         app.post('/items', async (req, res) => {
             const newWorkSheet = req.body;
             console.log(newWorkSheet);
@@ -152,7 +155,7 @@ async function run() {
             console.log(result);
             res.send(result);
         })
-
+        // update item id wise api
         app.put('/items/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) }
@@ -175,7 +178,7 @@ async function run() {
         })
 
 
-
+        // delete api for item
         app.delete('/items/:id', async (req, res) => {
             const id = req.params.id;
             console.log(id);
@@ -184,20 +187,10 @@ async function run() {
             res.send(result);
         })
 
-        // all seller api
-        // *******************************************
-        // **********************************************
-        // all buyer api
-
-        app.get('/users/seller', async (req, res) => {
-            const role = 'Seller';
-            console.log(role);
-            const query = { role: role }
-            const result = await AllUsersCollection.find(query).toArray();
-            res.send(result);
-        })
 
 
+
+        // email wise item get api
         app.get('/item/:email', async (req, res) => {
             const email = req.params.email;
 
@@ -216,7 +209,7 @@ async function run() {
             res.send(result);
         })
 
-
+        // email wise order get api
         app.get('/order/:email', async (req, res) => {
             const email = req.params.email;
             console.log(email);
@@ -224,15 +217,10 @@ async function run() {
             const result = await AllOrderCollection.find(query).toArray();
             res.send(result);
         })
-        app.post('/order', async (req, res) => {
-            const newOrder = req.body;
-            console.log(newOrder);
-            const result = await AllOrderCollection.insertOne(newOrder);
-            console.log(result);
-            res.send(result);
-        })
 
 
+
+        // email wise order get api
         app.get('/sorder/:email', async (req, res) => {
             const email = req.params.email;
             console.log(email);
@@ -240,7 +228,7 @@ async function run() {
             const result = await AllOrderCollection.find(query).toArray();
             res.send(result);
         })
-
+        // order post api
         app.post('/order', async (req, res) => {
             const newOrder = req.body;
             console.log(newOrder);
