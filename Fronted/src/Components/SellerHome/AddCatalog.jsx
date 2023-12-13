@@ -11,8 +11,6 @@ const AddCatalog = () => {
   const [userCatalogName, setUserCatalogName] = useState("");
   const [userItem, setUserItem] = useState([]);
   const [isSeller, isSellerLoading, refetch] = useSeller();
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,21 +100,32 @@ const AddCatalog = () => {
     });
   };
 
-  const handleEdit = (item) => {
-    setIsEditMode(true);
-    setSelectedItem(item);
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditMode(false);
-    setSelectedItem(null);
-  };
-
-  const handleUpdateItem = (e) => {
-    e.preventDefault();
-
-    setIsEditMode(false);
-    setSelectedItem(null);
+  const handleDelete = (_id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`http://localhost:5000/items/${_id}`, {
+          method: "DELETE",
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.deletedCount > 0) {
+              Swal.fire("Deleted!", "Your file has been deleted.", "success");
+              setUserItem((prevUserItems) =>
+                prevUserItems.filter((item) => item._id !== _id)
+              );
+              refetch();
+            }
+          });
+      }
+    });
   };
 
   return (
@@ -252,7 +261,12 @@ const AddCatalog = () => {
                         </Link>
                       </td>
                       <td>
-                        <button className="btn">Delete</button>
+                        <button
+                          onClick={() => handleDelete(item._id)}
+                          className="btn"
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))}

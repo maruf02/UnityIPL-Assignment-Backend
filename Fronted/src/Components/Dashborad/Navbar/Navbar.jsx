@@ -28,9 +28,23 @@ const Navbar = () => {
             <p>
               <Link to="/dashboard/addCatalog">AddCatalog</Link>
             </p>
+            <p>
+              <Link to="/dashboard/buyerOrder" className="px-5">
+                Buyer Order
+              </Link>
+            </p>
           </>
         ) : (
-          <></>
+          <>
+            <p className="text-lg underline pr-5">Buyer:- </p>
+
+            <p>
+              <Link to="/dashboard/sellerList">Seller List</Link>
+            </p>
+            <p className="px-5">
+              <Link to="/dashboard/order">Order</Link>
+            </p>
+          </>
         )}
       </div>
       <div className="navbar-end">

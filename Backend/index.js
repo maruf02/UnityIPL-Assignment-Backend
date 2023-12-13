@@ -31,11 +31,12 @@ async function run() {
         const AllUsersCollection = client.db('RandomDB').collection('Users');
         const AllCatalogCollection = client.db('RandomDB').collection('Catalog');
         const AllItemsCollection = client.db('RandomDB').collection('Items');
+        const AllOrderCollection = client.db('RandomDB').collection('order');
 
 
 
-
-
+        // **********************************************************
+        // all seler api
 
 
         app.get('/users', async (req, res) => {
@@ -101,7 +102,8 @@ async function run() {
         app.get('/catalog/:email', async (req, res) => {
             const email = req.params.email;
             // console.log('cc', email);
-            const cursor = AllCatalogCollection.find();
+            const query = { email: email }
+            const cursor = AllCatalogCollection.find(query);
             const result = await cursor.toArray();
             res.send(result);
         })
@@ -121,12 +123,17 @@ async function run() {
 
 
 
-
+        app.get('/items', async (req, res) => {
+            const cursor = AllItemsCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
 
         app.get('/items/:email', async (req, res) => {
             const email = req.params.email;
             console.log('cc', email);
-            const cursor = AllItemsCollection.find();
+            const query = { email: email }
+            const cursor = AllItemsCollection.find(query);
             const result = await cursor.toArray();
             res.send(result);
         })
@@ -167,6 +174,86 @@ async function run() {
 
         })
 
+
+
+        app.delete('/items/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            const query = { _id: new ObjectId(id) };
+            const result = await AllItemsCollection.deleteOne(query);
+            res.send(result);
+        })
+
+        // all seller api
+        // *******************************************
+        // **********************************************
+        // all buyer api
+
+        app.get('/users/seller', async (req, res) => {
+            const role = 'Seller';
+            console.log(role);
+            const query = { role: role }
+            const result = await AllUsersCollection.find(query).toArray();
+            res.send(result);
+        })
+
+
+        app.get('/item/:email', async (req, res) => {
+            const email = req.params.email;
+
+            // console.log('cc', email);
+            const query = { email: email }
+
+            const result = await AllItemsCollection.find(query).toArray();
+            res.send(result);
+        })
+
+
+        // order related api
+        app.get('/order', async (req, res) => {
+            const cursor = AllOrderCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+
+        app.get('/order/:email', async (req, res) => {
+            const email = req.params.email;
+            console.log(email);
+            const query = { buyerEmail: email }
+            const result = await AllOrderCollection.find(query).toArray();
+            res.send(result);
+        })
+        app.post('/order', async (req, res) => {
+            const newOrder = req.body;
+            console.log(newOrder);
+            const result = await AllOrderCollection.insertOne(newOrder);
+            console.log(result);
+            res.send(result);
+        })
+
+
+        app.get('/sorder/:email', async (req, res) => {
+            const email = req.params.email;
+            console.log(email);
+            const query = { sellerEmail: email }
+            const result = await AllOrderCollection.find(query).toArray();
+            res.send(result);
+        })
+
+        app.post('/order', async (req, res) => {
+            const newOrder = req.body;
+            console.log(newOrder);
+            const result = await AllOrderCollection.insertOne(newOrder);
+            console.log(result);
+            res.send(result);
+        })
+        // order related api
+
+
+
+        // all buyer api
+        // **********************************************
 
 
         // Send a ping to confirm a successful connection
